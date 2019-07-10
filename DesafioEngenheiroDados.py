@@ -21,8 +21,6 @@ from pyspark.sql.functions import unix_timestamp
 from pyspark.sql.functions import to_date
 from pyspark.sql.functions import desc
 from pyspark.sql.functions import sum
-
-import glob
 import re
 
 
