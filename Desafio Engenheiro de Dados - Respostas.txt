@@ -3,44 +3,50 @@
 # ### Data: 09/07/2019
 
 
-Qual​ ​o​ ​objetivo​ ​do​ ​comando​ ​​cache​ ​​em​ ​Spark?
+Qual o objetivo do comando cache em Spark?
 Resposta: Armazenar o RDD ou o Dataframe em memória para ganho de desempenho em caso de reutilização.
 
-O​ ​mesmo​ ​código​ ​implementado​ ​em​ ​Spark​ ​é​ ​normalmente​ ​mais​ ​rápido​ ​que​ ​a​ ​implementação​ ​equivalente​ ​em MapReduce.​ ​Por​ ​quê?
+O mesmo código implementado em Spark é normalmente mais rápido que a implementação equivalente em MapReduce. Por quê?
 Resposta: Porque o processamento do MapReduce é baseado em disco, enquanto o processamento do Spark consegue ser de 10 a 100 vezes mais rápido em memória.
 
-Qual​ ​é​ ​a​ ​função​ ​do​ ​​SparkContext​?
+Qual é a função do SparkContext?
 Resposta: O SparkContext é o motor do Spark. Ele estabelece a conexão e com o ambiente de execução do Spark.
 
-Explique​ ​com​ ​suas​ ​palavras​ ​​ ​o​ ​que​ ​é​ ​​Resilient​ ​Distributed​ ​Datasets​​ ​(RDD).
+Explique com suas palavras o que é Resilient Distributed Datasets  ​(RDD).
 Resposta: Os RDDs são uma representação lógica de um dataset. Eles são imutáveis e tolerantes a falha.
 
-GroupByKey​ ​​é​ ​menos​ ​eficiente​ ​que​ ​​reduceByKey​ ​​em​ ​grandes​ ​dataset.​ ​Por​ ​quê?
+GroupByKey é menos eficiente que reduceByKey em grandes dataset. Por quê?
 Resposta: Porque permite que dados desnecessários sejam trafegados pela rede.
 
-Explique​ ​o​ ​que​ ​o​ ​código​ ​Scala​ ​abaixo​ ​faz.
-val​​ ​​textFile​​ ​​=​​ ​​sc​.​textFile​(​"hdfs://..."​)
-val​​ ​​counts​​ ​​=​​ ​​textFile​.​flatMap​(​line​​ ​​=>​​ ​​line​.​split​(​"​ ​"​))​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​.​map​(​word​​​​=>​​​​(​word​,​​​​1​))
-​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​ ​​.​reduceByKey​(​_​​ ​​+​​ ​​_​) counts​.​saveAsTextFile​(​"hdfs://..."​)
+Explique o que o código Scala abaixo faz.
+val   textFile   =   sc.textFile("hdfs://...")
+val   counts   =   textFile.flatMap(line   =>   line.split(" ")).map(word  =>  (word,  1))
+                                 .reduceByKey(_+_) 
+                                 counts.saveAsTextFile("hdfs://...")
 
-Resposta: Este código lê um arquivo texto do HDFS, conta o número de palavras do arquivo e salva o resultado no HDFS.
+Resposta: Este código é um wordcount. Ele agrupa todas as palavras existentes no arquivo texto e calcula quantas ocorrências cada palavra tem.
+A função textFile lê o arquivo de texto do HDFS;
+A função flatMap transforma as linhas em tokens de palavras separadas por espaço; 
+A função map transforma as palavras em chave-valor (word, 1); 
+A função reduceByKey agrupa todas as palavras somando os seus valores; 
+A função saveAsTextFile salva o resultado de volta no HDFS.
 
 
 
-HTTP​ ​requests​ ​to​ ​the​ ​NASA​ ​Kennedy​ ​Space​ ​Center​ ​WWW​ ​server
+HTTP requests to the NASA Kennedy Space Center WWW server
 
 Questões
-​​Responda​ ​as​ ​seguintes​ ​questões​ ​devem​ ​ser​ ​desenvolvidas​ ​em​ ​Spark​ ​utilizando​ ​a​ ​sua​ ​linguagem​ ​de​ ​preferência.
+ Responda as seguintes questões devem ser desenvolvidas em Spark utilizando a sua linguagem de preferência.
 
 Obs.: Utilizei o PySpark e removi os registro com host vazio.
 
-1. Número​ ​de​ ​hosts​ ​únicos.
+1. Número de hosts únicos.
 Resposta: 137932
 
-2. O​ ​total​ ​de​ ​erros​ ​404.
+2. O total de erros 404.
 Resposta: 20787
 
-3. Os​ ​5​ ​URLs​ ​que​ ​mais​ ​causaram​ ​erro​ ​404.
+3. Os 5 URLs que mais causaram erro 404.
 Resposta: 
 hoohoo.ncsa.uiuc.edu  251
 piweba3y.prodigy.com  157
@@ -48,7 +54,7 @@ jbiagioni.npt.nuw...  132
 piweba1y.prodigy.com  114
 www-d4.proxy.aol.com   91
 
-4. Quantidade​ ​de​ ​erros​ ​404​ ​por​ ​dia.
+4. Quantidade de erros 404 por dia.
 Resposta: 
 +----------+-----+
 |       dia|count|
@@ -113,5 +119,5 @@ Resposta:
 |1995-08-31|  525|
 +----------+-----+
 
-5. O​ ​total​ ​de​ ​bytes​ ​retornados.
+5. O total de bytes retornados.
 Respostas: 65399297131
