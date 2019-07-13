@@ -21,16 +21,18 @@ from pyspark.sql.functions import unix_timestamp
 from pyspark.sql.functions import to_date
 from pyspark.sql.functions import desc
 from pyspark.sql.functions import sum
+from pyspark.sql.functions import when
+from pyspark.sql.functions import col
+
 import re
 
 
 # In[2]:
 
 
-if __name__ == "__main__":
-    sc = SparkContext()
-    sqlContext = SQLContext(sc)
-    spark = SparkSession.builder.appName("DesafioEngenheiroDadosDenivaldo").getOrCreate()
+sc = SparkContext()
+sqlContext = SQLContext(sc)
+spark = SparkSession.builder.appName("DesafioEngenheiroDadosDenivaldoCruz").getOrCreate()
 
 
 # ### Carregando os datasets
@@ -42,15 +44,27 @@ df = spark.read.text(['NASA_access_log_Jul95.gz', 'NASA_access_log_Aug95.gz'])
 df.show(5, truncate=False)
 
 
+# In[18]:
+
+
+df.head()
+
+
 # In[4]:
 
 
 print(df.count())
 
 
+# In[5]:
+
+
+df.describe().show()
+
+
 # ### Construindo o dataset com os campos host, timestamp, codigo_retorno e total_bytes
 
-# In[5]:
+# In[6]:
 
 
 ## RegEx dos campos
@@ -70,15 +84,27 @@ df_log.cache()
 df_log.show(10, truncate=True)
 
 
-# ### Removendo hosts vazios
-
-# In[6]:
-
-
-df_log = df_log.filter("host != ''")
-
+# ### Substituir hosts vazios por 'sem host'
 
 # In[7]:
+
+
+#df_log = df_log.filter("host != ''")
+
+
+# In[8]:
+
+
+df_log = df_log.withColumn('host', when(col('host') == '', "sem host").otherwise(col('host')))
+
+
+# In[9]:
+
+
+df_log.filter("host == 'sem host'").show()
+
+
+# In[10]:
 
 
 ## Total de registros
@@ -89,7 +115,7 @@ print((df_log.count(), len(df_log.columns)))
 
 # ### 1. Número de hosts únicos: 137932
 
-# In[8]:
+# In[11]:
 
 
 df_log.agg(countDistinct("host")).show()
@@ -97,7 +123,7 @@ df_log.agg(countDistinct("host")).show()
 
 # ### 2. O total de erros 404: 20787
 
-# In[9]:
+# In[12]:
 
 
 df_404 = df_log.filter(df_log.codigo_retorno == "404")
@@ -105,14 +131,14 @@ df_404.count()
 
 
 # ### 3. Os 5 URLs que mais causaram erro 404
-#
+# 
 # #### hoohoo.ncsa.uiuc.edu|  251|
 # #### piweba3y.prodigy.com|  157|
 # #### jbiagioni.npt.nuw...|  132|
 # #### piweba1y.prodigy.com|  114|
 # #### www-d4.proxy.aol.com|   91|
 
-# In[10]:
+# In[13]:
 
 
 from pyspark.sql.functions import desc
@@ -121,14 +147,14 @@ df_404.groupBy("host").count().sort(desc("count")).show()
 
 # ### 4. Quantidade de erros 404 por dia
 
-# In[11]:
+# In[14]:
 
 
 df_404 = df_404.withColumn("dia",to_date(unix_timestamp(df_log["timestamp"], "dd/MMM/yyyy").cast("timestamp")))
 df_404.show()
 
 
-# In[12]:
+# In[15]:
 
 
 df_404.groupBy('dia').count().orderBy('dia').show(60)
@@ -136,13 +162,14 @@ df_404.groupBy('dia').count().orderBy('dia').show(60)
 
 # ### 5. O total de bytes retornados
 
-# In[13]:
+# In[16]:
 
 
 df_log.select("total_bytes").groupBy().sum().show()
 
 
-# In[14]:
+# In[17]:
 
 
 df_log.agg(sum("total_bytes")).show()
+
